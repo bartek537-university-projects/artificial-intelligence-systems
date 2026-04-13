@@ -64,15 +64,15 @@ def k_means(data: DataFrame, k: int, metric: Callable[[DataFrame, Series], Serie
 
 
 def k_nearest(classified: DataFrame, labels: Series, unclassified: DataFrame, k: int,
-              metric: Callable[[DataFrame, Series], Series]) -> DataFrame:
-    predictions = DataFrame(0, index=unclassified.index, columns=["prediction"])
+              metric: Callable[[DataFrame, Series], Series]) -> Series:
+    predictions = Series(0, index=unclassified.index)
 
     for point_id, point in unclassified.iterrows():
         distances = metric(classified, point)
         nearest = distances.nsmallest(k).index
         voting = labels.loc[nearest].mode()
 
-        predictions.loc[point_id, "prediction"] = voting[0]
+        predictions.loc[point_id] = voting[0]
 
     return predictions
 

@@ -47,22 +47,22 @@ def manhattan_distance(data: DataFrame, centroid: Series) -> Series:
 
 
 def k_nearest(classified: DataFrame, labels: Series, unclassified: DataFrame, k: int,
-              metric: Callable[[DataFrame, Series], Series]) -> DataFrame:
-    predictions = DataFrame(0, index=unclassified.index, columns=["prediction"])
+              metric: Callable[[DataFrame, Series], Series]) -> Series:
+    predictions = Series(0, index=unclassified.index)
 
     for point_id, point in unclassified.iterrows():
         distances = metric(classified, point)
         nearest = distances.nsmallest(k).index
         voting = labels.loc[nearest].mode()
 
-        predictions.loc[point_id, "prediction"] = voting[0]
+        predictions.loc[point_id] = voting[0]
 
     return predictions
 
 
 # Przetestujmy teraz algorytm dla metryki Manhattan, dla k = 2, 3, 4.
 for k in [2, 3, 4]:
-    y_predicted = k_nearest(X_train_norm, y_train, X_validation_norm, k, metric=manhattan_distance)["prediction"]
+    y_predicted = k_nearest(X_train_norm, y_train, X_validation_norm, k, metric=manhattan_distance)
 
     valid_predictions = (y_predicted == y_validation).sum()
     total_predictions = len(y_predicted)
